@@ -1,0 +1,8 @@
+ docker network create learning-net  --Create only if not created
+ docker network connect learning-net api-gateway
+ docker run \
+    --name api-gateway \
+    --network learning-net \
+    -p 8765:8765 \
+    -e EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://serviceregistry:8761/eureka/ \
+    79d110602a50

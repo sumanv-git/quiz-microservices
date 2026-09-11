@@ -1,0 +1,98 @@
+name: quizapp
+
+services:
+  service-registry:
+    build:
+      context: service-registry
+    image: quizapp/serviceregistry:0.0.1
+    ports:
+      - "8761:8761"
+    container_name: service-registry
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/8761'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  postgres-dev:
+    image: postgres:15.18
+    container_name: postgres-dev
+    ports:
+      - "9032:5432"
+    environment:
+      - POSTGRES_DB=qustiondb
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=dev
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./db/init/question-table-data.sql:/docker-entrypoint-initdb.d/question-table-data.sql:ro
+    command: >
+      bash -c "docker-entrypoint.sh postgres &
+      until pg_isready -U dev -d qustiondb; do sleep 1; done;
+      psql -U dev -d qustiondb -tc \"SELECT 1 FROM pg_database WHERE datname = 'quizdb'\" | grep -q 1 || createdb -U dev quizdb;
+      wait"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d qustiondb && pg_isready -U dev -d quizdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  api-gateway:
+    build:
+      context: api-gateway
+    image: quizapp/api-gateway:0.0.1
+    container_name: api-gateway
+    ports:
+      - "8765:8765"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://service-registry:8761/eureka/
+#      - EUREKA_INSTANCE_HOSTNAME=api-gateway
+#      - EUREKA_INSTANCE_NON_SECURE_PORT=8765
+    depends_on:
+      service-registry:
+        condition: service_healthy
+
+  question-service:
+    build:
+      context: question-service
+    image: quizapp/question-service:0.0.1
+    ports:
+      - "9041:9041"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://service-registry:8761/eureka/
+#      - EUREKA_INSTANCE_HOSTNAME=question-service
+#      - EUREKA_INSTANCE_NON_SECURE_PORT=9041
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/qustiondb
+      - SPRING_DATASOURCE_USERNAME=dev
+      - SPRING_DATASOURCE_PASSWORD=dev
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      postgres-dev:
+        condition: service_healthy
+
+  quiz-service:
+    build:
+      context: quiz-service
+    image: quizapp/quiz-service:0.0.1
+    ports:
+      - "9042:9042"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://service-registry:8761/eureka/
+#      - EUREKA_INSTANCE_HOSTNAME=quiz-service
+#      - EUREKA_INSTANCE_NON_SECURE_PORT=9042
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/quizdb
+      - SPRING_DATASOURCE_USERNAME=dev
+      - SPRING_DATASOURCE_PASSWORD=dev
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      postgres-dev:
+        condition: service_healthy
+      question-service:
+        condition: service_started
+
+volumes:
+  postgres-dev-data:

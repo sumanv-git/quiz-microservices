@@ -1,0 +1,31 @@
+# Java / Maven
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper binary cache
+**/.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env/secrets
+.env
+.env.*
+!.env.example
+
+# Docker/local data
+postgres-dev-data/

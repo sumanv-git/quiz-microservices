@@ -1,0 +1,21 @@
+meta {
+  name: GetQuestionsForQuiz
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:9041/question/getQuestionsForQuiz?category=Java&numQuestions=5
+  body: none
+  auth: inherit
+}
+
+params:query {
+  category: Java
+  numQuestions: 5
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

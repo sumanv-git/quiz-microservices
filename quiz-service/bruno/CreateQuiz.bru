@@ -1,0 +1,22 @@
+meta {
+  name: CreateQuiz
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:9042/quiz/create?category=Java&numQ=5&title=Quiz1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  category: Java
+  numQ: 5
+  title: Quiz1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

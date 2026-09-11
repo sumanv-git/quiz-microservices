@@ -1,0 +1,11 @@
+docker build -t quizapp/quiz-service:0.0.1 .
+
+docker run \
+  --name quiz-service \
+  --network learning-net \
+  -p 9042:9042 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/quizdb \
+  -e SPRING_DATASOURCE_USERNAME=dev \
+  -e SPRING_DATASOURCE_PASSWORD=dev \
+  -e EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://serviceregistry:8761/eureka/ \
+  ec5e32d58cb0

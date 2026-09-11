@@ -1,0 +1,29 @@
+docker network create learning-net
+docker network connect learning-net serviceregistry
+docker network connect learning-net postgres-dev
+
+docker run \
+  --name question-service \
+  --network learning-net \
+  -p 9041:9041 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/qustiondb \
+  -e SPRING_DATASOURCE_USERNAME=dev \
+  -e SPRING_DATASOURCE_PASSWORD=dev \
+  -e EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://serviceregistry:8761/eureka/ \
+  445d63f860f3
+
+
+
+  docker tag question-service:0.0.1 vsuman74/quizapp:question-service-0.0.1
+
+  docker tag quizapp/api-gateway:0.0.1 vsuman74/quizapp:api-gateway-0.0.1
+
+  docker tag quizapp/quiz-service:0.0.1 vsuman74/quizapp:quiz-service-0.0.1
+
+  docker tag quizapp/serviceregistry:0.0.1 vsuman74/quizapp:serviceregistry-0.0.1
+
+
+  docker push vsuman74/quizapp:serviceregistry-0.0.1
+  docker push vsuman74/quizapp:api-gateway-0.0.1
+  docker push vsuman74/quizapp:question-service-0.0.1
+  docker push vsuman74/quizapp:quiz-service-0.0.1

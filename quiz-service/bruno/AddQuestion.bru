@@ -1,0 +1,28 @@
+meta {
+  name: AddQuestion
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:9041/question/add
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "questionTitle": "What is the output of the following Java code snippet?",
+      "option1": "4",
+      "option2": "5",
+      "option3": "6",
+      "option4": "Compile error",
+      "difficultylevel": "Easy",
+      "category": "Java"
+    }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

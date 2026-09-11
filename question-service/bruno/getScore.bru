@@ -1,0 +1,41 @@
+meta {
+  name: getScore
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:9042/question/getScore
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "questionId": 8,
+      "rightAnswer": "To terminate a loop or switch statement and transfer control to the next statement."
+    },
+    {
+      "questionId": 9,
+      "rightAnswer": "-"
+    },
+    {
+      "questionId": 7,
+      "rightAnswer": "do-while loop"
+    },
+    {
+      "questionId": 6,
+      "rightAnswer": "final int x = 5;"
+    },
+    {
+      "questionId": 5,
+      "rightAnswer": "It indicates that a method can be accessed without creating an instance of the class."
+    }
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

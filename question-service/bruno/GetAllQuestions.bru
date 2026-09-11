@@ -1,0 +1,16 @@
+meta {
+  name: GetAllQuestions
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:9041/question/allQuestions
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
