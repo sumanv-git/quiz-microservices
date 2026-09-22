@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-registry
+  labels:
+    app: service-registry
+spec:
+  selector:
+    matchLabels:
+      app: service-registry
+  template:
+    metadata:
+      labels:
+        app: service-registry
+    spec:
+      containers:
+        - name: service-registry
+          image: quizapp/serviceregistry:0.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8761
+
