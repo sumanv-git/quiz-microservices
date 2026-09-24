@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-service-app
+spec:
+  selector:
+    matchLabels:
+      app: quiz-service-app
+  template:
+    metadata:
+      labels:
+        app: quiz-service-app
+    spec:
+      containers:
+      - name: quiz-service-app
+        image: quizapp/quiz-service:0.0.1
+        ports:
+        - containerPort: 9042
+        env:
+          - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
+            valueFrom:
+              configMapKeyRef:
+                key: eureka-service-address
+                name: eureka-cm
+          - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+            value: "true"
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://pgsql-dev:5432/quizdb
+          - name: SPRING_DATASOURCE_USERNAME
+            value: dev
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: dev
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: quiz-service-svc
+spec:
+  selector:
+    app: quiz-service-app
+  ports:
+  - port: 80
+    targetPort: 9042
+
