@@ -1,6 +1,7 @@
 package com.learning.question.service;
 
 import com.learning.question.entity.Question;
+import com.learning.question.exception.QuestionServiceException;
 import com.learning.question.model.QuestionRequest;
 import com.learning.question.model.QuestionResponse;
 import com.learning.question.model.QuizResponse;
@@ -24,6 +25,9 @@ public class QuestionService {
     public List<QuestionResponse> getAllQuestions() {
        List<Question> questions = questionRepository.findAll();
 
+       if(questions.isEmpty())
+           throw new QuestionServiceException("No questions found","QUSTION_NOT_FOUND");
+
         return questions.stream()
                                         .map(questionMapper::toDto)
                                         .toList();
@@ -31,6 +35,8 @@ public class QuestionService {
 
     public List<QuestionResponse> getQuestionsByCategory(String category) {
         List<Question> questions = questionRepository.findByCategory(category);
+        if(questions.isEmpty())
+            throw new QuestionServiceException("No questions found for category","QUSTION_NOT_FOUND_FOR_CATEGORY");
         return questions.stream()
                 .map(questionMapper::toDto)
                 .toList();
@@ -45,7 +51,7 @@ public class QuestionService {
     public List<Integer> getQuestionsForQuiz(String category, Integer numQuestions) {
          List<Question> questions = questionRepository.findRandonQuestionsByCategory(category, numQuestions);
          if(questions.isEmpty())
-             throw new RuntimeException("No questions found for category: " + category);
+             throw new QuestionServiceException("No questions found for category","QUSTION_NOT_FOUND_FOR_CATEGORY");
 
          return questions.stream().mapToInt(Question::getId).boxed().toList();
     }
