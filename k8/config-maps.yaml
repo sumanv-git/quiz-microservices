@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: eureka-cm
 data:
-  eureka-service-address: "http://eureka-0.eureka:8761/eureka"
+  eureka-service-address: "http://eureka:8761/eureka/"

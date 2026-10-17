@@ -17,6 +17,14 @@ spec:
         ports:
         - containerPort: 9041
         env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: "k8s"
+          - name: EUREKA_INSTANCE_HOSTNAME
+            value: "question-service.quiz-production.svc.cluster.local"
+          - name: EUREKA_INSTANCE_IP_ADDRESS
+            value: "question-service.quiz-production.svc.cluster.local"
+          - name: EUREKA_PREFER_IP_ADDRESS
+            value: "false"
           - name: EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE
             valueFrom:
               configMapKeyRef:
