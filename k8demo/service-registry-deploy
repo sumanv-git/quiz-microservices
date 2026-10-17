@@ -19,4 +19,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "k8s"
 
