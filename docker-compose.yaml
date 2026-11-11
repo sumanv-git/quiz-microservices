@@ -15,6 +15,23 @@ services:
       retries: 12
       start_period: 30s
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC receiver
+      - "4318:4318"    # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:16686 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+
   postgres-dev:
     image: postgres:15.18
     container_name: postgres-dev
@@ -49,8 +66,11 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     depends_on:
       service-registry:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
 
   question-service:
@@ -65,10 +85,13 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/qustiondb
       - SPRING_DATASOURCE_USERNAME=dev
       - SPRING_DATASOURCE_PASSWORD=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     depends_on:
       service-registry:
         condition: service_healthy
       postgres-dev:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
 
   quiz-service:
@@ -83,6 +106,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/quizdb
       - SPRING_DATASOURCE_USERNAME=dev
       - SPRING_DATASOURCE_PASSWORD=dev
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     depends_on:
       service-registry:
         condition: service_healthy
@@ -90,6 +114,8 @@ services:
         condition: service_healthy
       question-service:
         condition: service_started
+      jaeger:
+        condition: service_healthy
 
 volumes:
   postgres-dev-data:
